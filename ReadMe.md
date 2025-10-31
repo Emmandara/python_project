@@ -142,6 +142,8 @@ A persistent leaderboard feature is also planned, allowing the game to store and
 
 Finally, unit testing scripts will be introduced to simulate user input and random number generation. This will allow the developer to test the program automatically and ensure that key features, such as input validation, progression logic, and error handling, continue working as intended after future updates.
 
+Full project can be found here:
+https://github.com/Emmandara/python_project.git
 
 Author
 
