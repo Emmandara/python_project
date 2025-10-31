@@ -3,7 +3,7 @@
 # function for setting difficulty
 import random
 DIFFICULTIES = {
-        #this dictionary will store the components that makes the game  atch its difficulty 
+        #this dictionary will store the components that makes the game  atch its difficulty  as a global dictionary
         "easy":            {"low": 1, "high": 20,  "max_attempts": 6,  "hint_mode": "full",    "hint_limit": None},
         "medium":          {"low": 1, "high": 50,  "max_attempts": 8,  "hint_mode": "full",    "hint_limit": None},
         "hard":            {"low": 1, "high": 100, "max_attempts": 8, "hint_mode": "full", "hint_limit": None},
@@ -17,8 +17,10 @@ def difficulties():
     print("Choose difficulty: Easy / Medium / Hard / Extremely Hard / Impossible")
 
     while True:
-        choice = input("> ").strip().lower()
+        choice = input("> ").strip().lower() # Prompt the user to enter a difficulty remove extra spaces and make lowercase
         if choice in DIFFICULTIES:
+            # If the input matches a valid difficulty 
+            # return both the choice and a copy so we dont alter global settings
             return choice, DIFFICULTIES[choice].copy()
         print("Please enter a valid difficulty!")
 def init_game_state(settings):
@@ -35,23 +37,24 @@ def init_game_state(settings):
         "hints_used":  0
     }
 
-def main_game(settings):
+def main_game(settings):#logic for how the game will work
+    #setting these as variables so i dont have to type info everytime
     info = init_game_state(settings)
     low,high =info["low"], info["high"]
     hint_mode = info["hint_mode"]
     hints_left = info["hints_left"]
-
+    
     print("Im thinking of  a number between",low," and", high)
     print("You have a max number attempts of ",info['max_attempts'])
     if info["hint_mode"] == "limited":
         print("  Hints are LIMITED: you have" ,info['hints_left'] ,"total high/low hints.")
-    while info["attempts"] < info["max_attempts"]:
+    while info["attempts"] < info["max_attempts"]:#keeps going untill max attempts reached
         guess = input ("Please enteer your guess ")
         if not guess.isdigit():
             print(" Please enter a valid whole number.")
             continue
         guess = int(guess)
-        if not (low <= guess <= high):
+        if not (low <= guess <= high):# forces users to keep guess within range
             print("Stay within range ",low ,high)
             continue
         info["attempts"] += 1
@@ -65,7 +68,7 @@ def main_game(settings):
                 print("Too low! Try again.")
             else:
                 print("Too high! Try again.")
-        elif  hint_mode == "limited":
+        elif  hint_mode == "limited": # if limited tracks how many hints you got left
             if hints_left and hints_left > 0:
                 if guess < info["secret"]:
                     print("Too low! Try again.")
@@ -78,17 +81,18 @@ def main_game(settings):
 
         else:  
             print("Incorrect! Try again.")
-
+    # game will end when max attempts is recahed
         if info["attempts"] == info["max_attempts"]:
             print(" Game Over! The number was ",info['secret'],".")
-            return False    
+            return False    #returning values so i can use result for survival mode
 def choose_mode():
+
     while True:
         try:
-            answer = input("Chosse which mode you would like to play 'Single game' or 'Survival mode'")
-            if answer in ("Single" ):
+            answer = input("Chosse which mode you would like to play 'Single game' or 'Survival mode'").strip().lower()
+            if answer in ("single" ):
                 return "single" ,1
-            elif answer in ("Survival" , "Survival mode"):
+            elif answer in ("survival" , "survival mode"):
                 return "Survival", 3
             else:
                 raise ValueError("Invalid mode")
@@ -101,55 +105,53 @@ print("===================================")
 print("Test your luck and logic!")
 #this allows to play again whilst error handling
 count=0
-no_lives= False
+
+
 while True:
         try:
             ready = input("Are you ready to play? (yes/no): ").strip().lower()
             
                
             if ready == "yes":
-                        choice, settings = difficulties()
+                        choice, settings = difficulties()# choose which difficulty they want
                         print("You chose:",choice.title())
-                        mode_name  , lives = choose_mode()
+                        order = list(DIFFICULTIES.keys())# making it a list so easy to manipulate
+                        
+                        current= order.index(choice) #grabbing the index of the stored value in difficulties
+                        mode_name  , lives = choose_mode() #choose mode they want
                         print("Mode name ",mode_name," lives",lives)
+                        #loop for survival mode will keep going until lost all 3 lives
                         while lives >0:  
-                            count += 1
+                            
                             
                             if main_game(settings):
                                 print("You won this round") 
-                                if mode_name == "Single":
+                                count += 1# count increased to show that you got win this is used for difficulty increase logic
+                                if mode_name == "single":
                                      break
+                            # if single mode loop will end after 1 run
+                            # below we have logic for difficulty increase   
+                                if count >= 3:
+                                    if current < len(order)-1:
+                                        next= order[current +1]
+                                        choice = next
+                                        settings = DIFFICULTIES[choice]
+                                        print("Difficuty has increased to",choice.title(),"!")
+                                    
+                                    else:
+                                        print("You are the highest level keep going ")
                             else:
                                 lives -= 1
                                 if lives> 0:
                                     print(" Round lost. Lives remaining: ",lives,". Starting next round...")
+                                    continue
                                 else:
-                                    print(" No lives left. Better luck next time!\n")
-                                    no_lives=True
-                                    
-                            if count % 2 == 0:
-                                order = list(DIFFICULTIES.keys())
-                                current= order.index(choice) 
-                                if current < len(order)-1:
-                                      next= order[current +1]
-                                      choice = next
-                                      settings = DIFFICULTIES[choice]
-                                      print("Difficuty has increased to",choice.title(),"!")
-                                elif no_lives == True:
-                                     print("You are out of lives game over")
-                                else:
-                                     print("You are the highest level keep going ")
-                                 
-
-
-                                      
-                                      
-                                 
-                                 
+                                    print(" No lives left. Better luck next time")
+                                    break                 
                                
-                        while True:
+                        while True:# Thios code sorts out play again
                                     try:
-                                        play_again = input("\nWould you like to play again? (yes/no): ").strip().lower()
+                                        play_again = input("Would you like to play again? (yes/no): ").strip().lower()
                                         if play_again in ("yes"):
                                             print("Restarting game...")
                                             break  
