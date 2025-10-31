@@ -2,15 +2,16 @@
 
 # function for setting difficulty
 import random
-def difficulties():
-    DIFFICULTIES = {
+DIFFICULTIES = {
         #this dictionary will store the components that makes the game  atch its difficulty 
         "easy":            {"low": 1, "high": 20,  "max_attempts": 6,  "hint_mode": "full",    "hint_limit": None},
         "medium":          {"low": 1, "high": 50,  "max_attempts": 8,  "hint_mode": "full",    "hint_limit": None},
-        "hard":            {"low": 1, "high": 100, "max_attempts": 10, "hint_mode": "full", "hint_limit": None},
+        "hard":            {"low": 1, "high": 100, "max_attempts": 8, "hint_mode": "full", "hint_limit": None},
         "extremely hard":  {"low": 1, "high": 150, "max_attempts": 8,  "hint_mode": "limited",    "hint_limit": 5},
         "impossible":      {"low": 1, "high": 1000, "max_attempts": 5,  "hint_mode": "limited", "hint_limit": 2},  
     }
+def difficulties():
+  # this function is used for chosssing difficulty
 
     print(" Guess the Number Game")
     print("Choose difficulty: Easy / Medium / Hard / Extremely Hard / Impossible")
@@ -21,6 +22,7 @@ def difficulties():
             return choice, DIFFICULTIES[choice].copy()
         print("Please enter a valid difficulty!")
 def init_game_state(settings):
+    #this function will initialize the stats at beginning, it takes in settings which will have difficiulty choice
     return {
         "low":         int(settings["low"]),
         "high":        int(settings["high"]),
@@ -70,7 +72,7 @@ def main_game(settings):
                 else:
                     print("Too high! Try again.")
                 hints_left -= 1
-                print(f"(Hints left: {hints_left})")
+                print("(Hints left: ",hints_left,")")
             else:
                 print("Wrong! No hints left.")
 
@@ -84,7 +86,7 @@ def choose_mode():
     while True:
         try:
             answer = input("Chosse which mode you would like to play 'Single game' or 'Survival mode'")
-            if answer in ("Single" , "S"):
+            if answer in ("Single" ):
                 return "single" ,1
             elif answer in ("Survival" , "Survival mode"):
                 return "Survival", 3
@@ -99,6 +101,7 @@ print("===================================")
 print("Test your luck and logic!")
 #this allows to play again whilst error handling
 count=0
+no_lives= False
 while True:
         try:
             ready = input("Are you ready to play? (yes/no): ").strip().lower()
@@ -110,6 +113,7 @@ while True:
                         mode_name  , lives = choose_mode()
                         print("Mode name ",mode_name," lives",lives)
                         while lives >0:  
+                            count += 1
                             
                             if main_game(settings):
                                 print("You won this round") 
@@ -121,7 +125,25 @@ while True:
                                     print(" Round lost. Lives remaining: ",lives,". Starting next round...")
                                 else:
                                     print(" No lives left. Better luck next time!\n")
-                            if count % 3 == 0:
+                                    no_lives=True
+                                    
+                            if count % 2 == 0:
+                                order = list(DIFFICULTIES.keys())
+                                current= order.index(choice) 
+                                if current < len(order)-1:
+                                      next= order[current +1]
+                                      choice = next
+                                      settings = DIFFICULTIES[choice]
+                                      print("Difficuty has increased to",choice.title(),"!")
+                                elif no_lives == True:
+                                     print("You are out of lives game over")
+                                else:
+                                     print("You are the highest level keep going ")
+                                 
+
+
+                                      
+                                      
                                  
                                  
                                
