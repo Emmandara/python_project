@@ -49,7 +49,10 @@ def main_game(settings):#logic for how the game will work
     if info["hint_mode"] == "limited":
         print("  Hints are LIMITED: you have" ,info['hints_left'] ,"total high/low hints.")
     while info["attempts"] < info["max_attempts"]:#keeps going untill max attempts reached
-        guess = input ("Please enteer your guess ")
+        guess = input ("Please enter your guess or type in 'exit' or 'quit' to end game")
+        if guess in ("exit", "quit"):
+            print("Thanks for playing! Exiting game...")
+            quit()
         if not guess.isdigit():
             print(" Please enter a valid whole number.")
             continue
